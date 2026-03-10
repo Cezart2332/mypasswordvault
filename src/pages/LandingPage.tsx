@@ -1,34 +1,38 @@
 import { Link } from 'react-router-dom';
+import {
+  FiLock, FiZap, FiShield, FiKey, FiFolder, FiGlobe,
+  FiSearch, FiMail, FiBriefcase, FiShoppingCart,
+} from 'react-icons/fi';
 import './LandingPage.css';
 
 const features = [
   {
-    icon: '🔐',
+    icon: <FiLock size={26} />,
     title: 'AES-256 Encryption',
     desc: 'Every password is encrypted with military-grade AES-256 before it ever reaches our database.',
   },
   {
-    icon: '⚡',
+    icon: <FiZap size={26} />,
     title: 'Instant Access',
     desc: 'Find any credential in milliseconds with smart search across titles, usernames, and URLs.',
   },
   {
-    icon: '🛡️',
+    icon: <FiShield size={26} />,
     title: 'Zero-Knowledge',
     desc: 'We never see your master password. Only you can decrypt your vault.',
   },
   {
-    icon: '🔑',
+    icon: <FiKey size={26} />,
     title: 'Password Generator',
     desc: 'Generate strong, unique passwords with custom length and character rules.',
   },
   {
-    icon: '📂',
+    icon: <FiFolder size={26} />,
     title: 'Organized Vault',
     desc: 'Categorize entries, mark favorites and keep everything structured.',
   },
   {
-    icon: '🌐',
+    icon: <FiGlobe size={26} />,
     title: 'Secure API',
     desc: 'JWT authenticated REST API ensures only you can access your data.',
   },
@@ -41,7 +45,7 @@ export default function LandingPage() {
       <nav className="landing-nav">
         <div className="landing-nav-inner">
           <div className="landing-logo">
-            <span className="logo-icon">🔒</span>
+            <FiLock size={22} className="logo-icon" />
             <span>MyPasswordVault</span>
           </div>
           <div className="landing-nav-links">
@@ -56,7 +60,7 @@ export default function LandingPage() {
         <div className="hero-glow" />
         <div className="hero-content fade-in">
           <div className="hero-badge badge badge-blue">
-            <span>🔒</span> Secure by default
+            <FiLock size={12} /> Secure by default
           </div>
           <h1 className="hero-title">
             Your passwords,<br />
@@ -87,14 +91,14 @@ export default function LandingPage() {
               <span className="preview-title">My Vault</span>
             </div>
             <div className="preview-search">
-              <span className="preview-search-icon">🔍</span>
+              <FiSearch size={13} className="preview-search-icon" />
               <span className="preview-search-text">Search passwords...</span>
             </div>
             {[
-              { icon: '🌐', name: 'GitHub', user: 'john@email.com', strength: 4 },
-              { icon: '📧', name: 'Gmail', user: 'john@gmail.com', strength: 3 },
-              { icon: '💼', name: 'LinkedIn', user: 'john.doe', strength: 4 },
-              { icon: '🛒', name: 'Amazon', user: 'john@email.com', strength: 2 },
+              { icon: <FiGlobe size={16} />, name: 'GitHub', user: 'john@email.com', strength: 4 },
+              { icon: <FiMail size={16} />, name: 'Gmail', user: 'john@gmail.com', strength: 3 },
+              { icon: <FiBriefcase size={16} />, name: 'LinkedIn', user: 'john.doe', strength: 4 },
+              { icon: <FiShoppingCart size={16} />, name: 'Amazon', user: 'john@email.com', strength: 2 },
             ].map((item) => (
               <div className="preview-item" key={item.name}>
                 <span className="preview-item-icon">{item.icon}</span>

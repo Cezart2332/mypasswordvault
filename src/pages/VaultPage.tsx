@@ -1,4 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
+import {
+  FiLock, FiGrid, FiCode, FiMail, FiBriefcase, FiKey,
+  FiLogOut, FiSearch, FiX, FiPlus, FiLoader, FiInbox,
+  FiEye, FiEyeOff, FiCopy, FiTrash2,
+} from 'react-icons/fi';
 import AddPasswordModal from '../components/vault/AddPasswordModal';
 import { useAuth } from '../context/AuthContext';
 import { getUserInfo } from '../services/userService';
@@ -100,7 +105,7 @@ export default function VaultPage() {
       {/* ── SIDEBAR ── */}
       <aside className="vault-sidebar">
         <div className="sidebar-brand">
-          <span>🔒</span>
+          <FiLock size={20} />
           <span>MyPasswordVault</span>
         </div>
 
@@ -129,7 +134,9 @@ export default function VaultPage() {
               className={`sidebar-nav-item ${activeCategory === cat ? 'active' : ''}`}
               onClick={() => setActiveCategory(cat)}
             >
-              <span>{cat === 'All' ? '🗂️' : cat === 'Dev' ? '💻' : cat === 'Email' ? '📧' : cat === 'Work' ? '💼' : '🔑'}</span>
+              <span className="sidebar-nav-icon">
+                {cat === 'All' ? <FiGrid size={14} /> : cat === 'Dev' ? <FiCode size={14} /> : cat === 'Email' ? <FiMail size={14} /> : cat === 'Work' ? <FiBriefcase size={14} /> : <FiKey size={14} />}
+              </span>
               <span>{cat}</span>
               <span className="sidebar-nav-count">
                 {cat === 'All' ? entries.length : entries.filter(e => e.category === cat).length}
@@ -147,7 +154,7 @@ export default function VaultPage() {
             </div>
           </div>
           <button className="btn btn-ghost btn-sm btn-full sidebar-logout" onClick={logOut}>
-            🚪 Sign out
+            <FiLogOut size={15} /> Sign out
           </button>
         </div>
       </aside>
@@ -162,7 +169,7 @@ export default function VaultPage() {
           </div>
           <div className="vault-topbar-right">
             <div className="search-box">
-              <span className="search-icon">🔍</span>
+              <FiSearch size={15} className="search-icon" />
               <input
                 type="text"
                 placeholder="Search passwords, URLs…"
@@ -170,11 +177,11 @@ export default function VaultPage() {
                 onChange={e => setSearch(e.target.value)}
               />
               {search && (
-                <span className="search-clear" onClick={() => setSearch('')}>✕</span>
+                <span className="search-clear" onClick={() => setSearch('')}><FiX size={13} /></span>
               )}
             </div>
             <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-              + Add password
+              <FiPlus size={16} /> Add password
             </button>
           </div>
         </header>
@@ -182,12 +189,12 @@ export default function VaultPage() {
         {/* Password grid */}
         {loading ? (
           <div className="vault-empty">
-            <span className="vault-empty-icon">⏳</span>
+            <FiLoader size={48} className="vault-empty-icon spin" />
             <h3>Loading vault…</h3>
           </div>
         ) : filtered.length === 0 ? (
           <div className="vault-empty">
-            <span className="vault-empty-icon">🔑</span>
+            <FiInbox size={48} className="vault-empty-icon" />
             <h3>No entries found</h3>
             <p>Try a different search or category</p>
           </div>
@@ -243,21 +250,21 @@ export default function VaultPage() {
                       title="Reveal password"
                       onClick={() => setRevealedId(revealedId === entry.id ? null : entry.id)}
                     >
-                      {revealedId === entry.id ? '🙈' : '👁️'}
+                      {revealedId === entry.id ? <FiEyeOff size={15} /> : <FiEye size={15} />}
                     </button>
                     <button
                       className="btn btn-icon"
                       title="Copy password"
                       onClick={() => handleCopy(entry.password)}
                     >
-                      📋
+                      <FiCopy size={15} />
                     </button>
                     <button
                       className="btn btn-icon btn-icon-danger"
                       title="Delete"
                       onClick={() => handleDelete(entry.id)}
                     >
-                      🗑️
+                      <FiTrash2 size={15} />
                     </button>
                   </div>
                 </div>

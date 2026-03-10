@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { FiKey, FiX, FiZap, FiRefreshCw, FiEye, FiEyeOff } from 'react-icons/fi';
 import { addVaultItem } from '../../services/vaultService';
 import './AddPasswordModal.css';
 
@@ -93,10 +94,10 @@ export default function AddPasswordModal({ onClose, onAdd }: Props) {
         {/* Header */}
         <div className="modal-header">
           <div className="modal-title-group">
-            <span className="modal-title-icon">🔑</span>
+            <FiKey size={20} className="modal-title-icon" />
             <h3>Add password</h3>
           </div>
-          <button className="btn btn-icon" onClick={onClose}>✕</button>
+          <button className="btn btn-icon" onClick={onClose}><FiX size={17} /></button>
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
@@ -127,7 +128,7 @@ export default function AddPasswordModal({ onClose, onAdd }: Props) {
                 className="btn btn-sm btn-outline"
                 onClick={() => setShowGenerator(g => !g)}
               >
-                ⚡ {showGenerator ? 'Hide' : 'Generate'}
+                <FiZap size={13} /> {showGenerator ? 'Hide' : 'Generate'}
               </button>
             </div>
             <div className="input-wrapper">
@@ -141,7 +142,7 @@ export default function AddPasswordModal({ onClose, onAdd }: Props) {
                 className="mono"
               />
               <span className="input-icon" onClick={() => setShowPw(p => !p)}>
-                {showPw ? '🙈' : '👁️'}
+                {showPw ? <FiEyeOff size={16} /> : <FiEye size={16} />}
               </span>
             </div>
 
@@ -164,7 +165,7 @@ export default function AddPasswordModal({ onClose, onAdd }: Props) {
               <div className="gen-header">
                 <span className="gen-preview mono">{genPreview}</span>
                 <div className="gen-header-actions">
-                  <button type="button" className="btn btn-icon" title="Regenerate" onClick={() => regenerate()}>🔄</button>
+                  <button type="button" className="btn btn-icon" title="Regenerate" onClick={() => regenerate()}><FiRefreshCw size={15} /></button>
                   <button type="button" className="btn btn-sm btn-primary" onClick={useGenerated}>Use this</button>
                 </div>
               </div>

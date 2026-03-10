@@ -33,7 +33,7 @@ export async function deriveHash(password: string, salt: Uint8Array): Promise<st
     {
       name: 'PBKDF2',
       salt: salt as BufferSource,
-      iterations: 200_000, // sau Argon2 dacă folosești library extern
+      iterations: 600_000, 
       hash: 'SHA-256'
     },
     keyMaterial,

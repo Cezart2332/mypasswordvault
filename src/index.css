@@ -28,10 +28,10 @@
   --text-muted:   #5a7fa8;
   --text-dim:     #3a5a7a;
 
-  --radius-sm:    6px;
-  --radius:       12px;
-  --radius-lg:    18px;
-  --radius-xl:    24px;
+  --radius-sm:    8px;
+  --radius:       14px;
+  --radius-lg:    20px;
+  --radius-xl:    28px;
 
   --shadow-card:  0 4px 32px rgba(0, 0, 0, 0.6);
   --shadow-glow:  0 0 24px rgba(29, 110, 247, 0.2);
@@ -87,7 +87,7 @@ h1, h2, h3, h4 { font-weight: 600; letter-spacing: -0.02em; line-height: 1.2; }
   align-items: center;
   gap: 8px;
   padding: 10px 20px;
-  border-radius: var(--radius-sm);
+  border-radius: 10px;
   font-size: 0.9rem;
   font-weight: 500;
   font-family: inherit;
@@ -137,7 +137,7 @@ h1, h2, h3, h4 { font-weight: 600; letter-spacing: -0.02em; line-height: 1.2; }
   box-shadow: 0 0 16px rgba(240, 74, 107, 0.3);
 }
 
-.btn-lg { padding: 13px 28px; font-size: 1rem; border-radius: var(--radius); }
+.btn-lg { padding: 13px 28px; font-size: 1rem; border-radius: 14px; }
 .btn-sm { padding: 6px 14px; font-size: 0.8rem; }
 .btn-full { width: 100%; justify-content: center; }
 
@@ -146,7 +146,10 @@ h1, h2, h3, h4 { font-weight: 600; letter-spacing: -0.02em; line-height: 1.2; }
   background: rgba(255,255,255,0.04);
   color: var(--text-muted);
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .btn-icon:hover { background: rgba(255,255,255,0.08); color: var(--text); }
 
@@ -170,11 +173,11 @@ h1, h2, h3, h4 { font-weight: 600; letter-spacing: -0.02em; line-height: 1.2; }
 .form-group select {
   background: var(--bg-input);
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: 10px;
   color: var(--text);
   font-family: inherit;
   font-size: 0.95rem;
-  padding: 10px 14px;
+  padding: 11px 16px;
   transition: var(--transition);
   box-shadow: var(--shadow-input);
   width: 100%;
@@ -201,6 +204,9 @@ h1, h2, h3, h4 { font-weight: 600; letter-spacing: -0.02em; line-height: 1.2; }
   color: var(--text-muted);
   cursor: pointer;
   transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .input-wrapper .input-icon:hover { color: var(--accent); }
 

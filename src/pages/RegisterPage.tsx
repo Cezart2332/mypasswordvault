@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { FiLock, FiEye, FiEyeOff, FiCheck } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { register as apiRegister } from '../services/authService';
 import './AuthPage.css';
@@ -50,7 +51,7 @@ export default function RegisterPage() {
 
       <div className="auth-panel-left">
         <Link to="/" className="auth-brand">
-          <span className="auth-brand-icon">🔒</span>
+          <FiLock size={20} className="auth-brand-icon" />
           <span>MyPasswordVault</span>
         </Link>
         <div className="auth-panel-tagline">
@@ -65,7 +66,7 @@ export default function RegisterPage() {
             'Built-in password generator',
           ].map(item => (
             <div className="auth-check-item" key={item}>
-              <span className="auth-check-icon">✓</span>
+              <span className="auth-check-icon"><FiCheck size={10} /></span>
               <span>{item}</span>
             </div>
           ))}
@@ -116,7 +117,7 @@ export default function RegisterPage() {
                   autoComplete="new-password"
                 />
                 <span className="input-icon" onClick={() => setShowPassword(p => !p)}>
-                  {showPassword ? '🙈' : '👁️'}
+                  {showPassword ? <FiEyeOff size={16} /> : <FiEye size={16} />}
                 </span>
               </div>
               {password.length > 0 && (

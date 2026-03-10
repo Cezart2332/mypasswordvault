@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import './AuthPage.css';
 
@@ -35,7 +36,7 @@ export default function LoginPage() {
       {/* Left panel — branding */}
       <div className="auth-panel-left">
         <Link to="/" className="auth-brand">
-          <span className="auth-brand-icon">🔒</span>
+          <FiLock size={20} className="auth-brand-icon" />
           <span>MyPasswordVault</span>
         </Link>
         <div className="auth-panel-tagline">
@@ -91,7 +92,7 @@ export default function LoginPage() {
                   onClick={() => setShowPassword(p => !p)}
                   title={showPassword ? 'Hide' : 'Show'}
                 >
-                  {showPassword ? '🙈' : '👁️'}
+                  {showPassword ? <FiEyeOff size={16} /> : <FiEye size={16} />}
                 </span>
               </div>
             </div>

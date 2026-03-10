@@ -37,7 +37,11 @@
   text-decoration: none;
 }
 .auth-brand:hover { color: var(--accent); }
-.auth-brand-icon { font-size: 1.5rem; }
+.auth-brand-icon {
+  display: flex;
+  align-items: center;
+  color: var(--accent);
+}
 
 .auth-panel-tagline { flex: 1; display: flex; flex-direction: column; gap: 14px; justify-content: center; }
 .auth-panel-tagline h2 {
@@ -81,7 +85,6 @@
   border: 1px solid rgba(0,212,138,0.3);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 0.65rem;
   color: var(--success);
   flex-shrink: 0;
 }
