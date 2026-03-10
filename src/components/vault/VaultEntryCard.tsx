@@ -1,0 +1,1 @@
+// Vault entry card component
