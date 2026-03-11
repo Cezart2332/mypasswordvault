@@ -1,6 +1,7 @@
 services:
   frontend:
     image: cezarique/passfrontend:latest
+    pull_policy: always
     ports:
       - "80:80"
     restart: unless-stopped
