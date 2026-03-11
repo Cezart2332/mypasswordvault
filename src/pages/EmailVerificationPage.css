@@ -1,0 +1,142 @@
+/* ─── EMAIL VERIFICATION CARD ───────────────────────────────── */
+.ev-card {
+  text-align: center;
+}
+
+/* Mail icon circle */
+.ev-icon-wrap {
+  width: 68px;
+  height: 68px;
+  background: var(--accent-glow);
+  border: 1px solid rgba(0, 200, 255, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+  color: var(--accent);
+}
+.ev-icon-loading {
+  background: var(--accent-glow);
+  border-color: rgba(0, 200, 255, 0.3);
+  color: var(--accent);
+  animation: ev-pulse 1.4s ease-in-out infinite;
+}
+.ev-icon-success {
+  background: var(--success-dim);
+  border-color: rgba(0, 212, 138, 0.3);
+  color: var(--success);
+}
+.ev-icon-error {
+  background: var(--danger-dim);
+  border-color: rgba(240, 74, 107, 0.3);
+  color: var(--danger);
+}
+@keyframes ev-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+/* Header overrides for centered layout */
+.ev-header {
+  margin-bottom: 16px;
+}
+.ev-header p {
+  margin-bottom: 6px;
+}
+
+/* Email address pill */
+.ev-email {
+  display: inline-block;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-glow);
+  border-radius: var(--radius-sm);
+  padding: 5px 14px;
+  font-size: 0.875rem;
+  color: var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+  margin-top: 6px;
+  word-break: break-all;
+}
+.ev-email-unknown {
+  color: var(--text-muted);
+}
+
+/* Body hint text */
+.ev-hint {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  line-height: 1.75;
+  margin-bottom: 24px;
+}
+.ev-hint strong {
+  color: var(--text);
+}
+
+/* Feedback messages */
+.ev-feedback {
+  font-size: 0.875rem;
+  border-radius: var(--radius-sm);
+  padding: 10px 16px;
+  margin-bottom: 12px;
+}
+.ev-feedback--success {
+  color: var(--success);
+  background: var(--success-dim);
+  border: 1px solid rgba(0, 212, 138, 0.25);
+}
+.ev-feedback--error {
+  color: var(--danger);
+  background: var(--danger-dim);
+  border: 1px solid rgba(240, 74, 107, 0.25);
+}
+
+/* Countdown timer row */
+.ev-timer-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 18px;
+  margin-bottom: 12px;
+}
+.ev-timer-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.ev-timer {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent);
+  min-width: 44px;
+  letter-spacing: 0.05em;
+}
+
+/* Resend button — full width */
+.ev-resend-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+/* Footer back-link */
+.ev-footer {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+/* Spinning icon while sending */
+@keyframes ev-spin {
+  to { transform: rotate(360deg); }
+}
+.ev-spin {
+  animation: ev-spin 0.8s linear infinite;
+}

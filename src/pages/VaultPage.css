@@ -129,6 +129,8 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.sidebar-settings { color: var(--text-muted) !important; justify-content: flex-start !important; gap: 8px; text-decoration: none; }
+.sidebar-settings:hover { color: var(--text-primary) !important; }
 .sidebar-logout { color: var(--text-muted) !important; justify-content: flex-start !important; gap: 8px; }
 .sidebar-logout:hover { color: var(--danger) !important; }
 

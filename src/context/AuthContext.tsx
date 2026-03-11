@@ -1,10 +1,17 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { login as apiLogin, refreshToken as apiRefresh, logout as apiLogout } from '../services/authService';
-import { setAccessToken as setAxiosToken } from '../services/api';
+import { setAccessToken as setAxiosToken, setAuthFailCallback } from '../services/api';
+
+interface TwoFactorPending {
+  requiresTwoFactor: true;
+  pendingToken: string;
+  vaultKey: CryptoKey;
+}
 
 interface AuthContextType {
   accessToken: string | null;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<TwoFactorPending | void>;
+  loginWithToken: (token: string) => void;
   logout: () => Promise<void>;
   getAccessToken: () => Promise<string | null>;
 }
@@ -17,6 +24,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 
   useEffect(() => {
+    // Register logout callback for the Axios 401 interceptor
+    setAuthFailCallback(() => {
+      setAccessToken(null);
+      setAxiosToken(null);
+    });
+
     apiRefresh()
       .then(data => {
         setAxiosToken(data.token);
@@ -28,11 +41,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .finally(() => setIsRestoring(false));
   }, []);
 
-  const login = async (email: string, password: string) => {
-    // Server sets refreshToken as httpOnly cookie automatically
+  const login = async (email: string, password: string): Promise<TwoFactorPending | void> => {
     const data = await apiLogin(email, password);
+    if (data.requiresTwoFactor) {
+      // Carry the vaultKey temporarily so TwoFactorLoginPage can use it
+      return { requiresTwoFactor: true, pendingToken: data.pendingToken, vaultKey: data._vaultKey };
+    }
     setAccessToken(data.token);
     setAxiosToken(data.token);
+  };
+
+  const loginWithToken = (token: string) => {
+    setAccessToken(token);
+    setAxiosToken(token);
   };
 
   const logout = async () => {
@@ -62,7 +83,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
    if (isRestoring) return null; // or a loading spinner
 
   return (
-    <AuthContext.Provider value={{ accessToken, login, logout, getAccessToken }}>
+    <AuthContext.Provider value={{ accessToken, login, loginWithToken, logout, getAccessToken }}>
       {children}
     </AuthContext.Provider>
   );

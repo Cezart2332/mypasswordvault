@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { FiLock, FiEye, FiEyeOff, FiCheckCircle } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import './AuthPage.css';
 
@@ -9,7 +9,10 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
+  const resetSuccess = (location.state as any)?.resetSuccess === true;
+  const stateMessage: string | undefined = (location.state as any)?.message;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,9 +23,18 @@ export default function LoginPage() {
     const password = (document.getElementById('password') as HTMLInputElement).value;
 
     try {
-      await login(email, password);   // token stored in-memory via AuthContext
+      const result = await login(email, password);
+      if (result?.requiresTwoFactor) {
+        navigate('/two-factor', { state: { pendingToken: result.pendingToken, vaultKey: result.vaultKey } });
+        return;
+      }
       navigate('/vault');
-    } catch {
+    } catch (err: any) {
+      const msg: string = err?.response?.data?.message ?? '';
+      if (msg.toLowerCase().includes('verif')) {
+        navigate('/verify-email', { state: { email } });
+        return;
+      }
       setError('Invalid email or password.');
     } finally {
       setLoading(false);
@@ -65,6 +77,24 @@ export default function LoginPage() {
             <p>Sign in to access your vault</p>
           </div>
 
+          {(resetSuccess || stateMessage) && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.6rem',
+              padding: '0.75rem 1rem',
+              borderRadius: '10px',
+              background: 'rgba(34,197,94,0.1)',
+              border: '1px solid rgba(34,197,94,0.3)',
+              marginBottom: '1rem',
+              fontSize: '0.875rem',
+              color: '#4ade80',
+            }}>
+              <FiCheckCircle size={16} />
+              {stateMessage ?? 'Password reset successfully. You can now sign in with your new password.'}
+            </div>
+          )}
+
           <form className="auth-form" onSubmit={handleSubmit}>
             <div className="form-group">
               <label htmlFor="email">Email</label>
@@ -106,6 +136,10 @@ export default function LoginPage() {
             >
               {loading ? <><span className="spinner" /> Signing in…</> : 'Sign in →'}
             </button>
+
+            <p className="auth-switch" style={{ marginTop: '0.75rem', marginBottom: 0 }}>
+              <Link to="/forgot-password">Forgot your password?</Link>
+            </p>
           </form>
 
           <hr className="divider" />

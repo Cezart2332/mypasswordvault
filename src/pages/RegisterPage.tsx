@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiLock, FiEye, FiEyeOff, FiCheck } from 'react-icons/fi';
-import { useAuth } from '../context/AuthContext';
 import { register as apiRegister } from '../services/authService';
 import './AuthPage.css';
 
@@ -23,7 +22,6 @@ export default function RegisterPage() {
   const strength = getStrength(password);
 
   const navigate = useNavigate();
-  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,8 +34,9 @@ export default function RegisterPage() {
 
     try {
       await apiRegister(username, email, pw);
-      await login(email, pw); // optional auto-login after registration
-      navigate('/vault');
+      // Mark that a verification email was just sent so the resend cooldown starts now
+      localStorage.setItem('emailVerification_lastSent', Date.now().toString());
+      navigate('/verify-email', { state: { email } });
     } catch {
       setError('Could not create account. Please check your details and try again.');
     } finally {

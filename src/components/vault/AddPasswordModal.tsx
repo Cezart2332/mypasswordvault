@@ -1,11 +1,25 @@
 import { useState } from 'react';
 import { FiKey, FiX, FiZap, FiRefreshCw, FiEye, FiEyeOff } from 'react-icons/fi';
-import { addVaultItem } from '../../services/vaultService';
+import { addVaultItem, updateVaultItem } from '../../services/vaultService';
 import './AddPasswordModal.css';
+
+interface EditEntry {
+  id: number;
+  title: string;
+  password: string;
+  username: string;
+  url: string;
+  notes: string;
+  category: string;
+  isFavorite: boolean;
+}
 
 interface Props {
   onClose: () => void;
   onAdd: () => void;
+  onSuccess?: (msg: string) => void;
+  onError?: (msg: string) => void;
+  entry?: EditEntry;
 }
 
 const CHARSETS = {
@@ -23,15 +37,14 @@ function generatePassword(length: number, opts: typeof DEFAULT_OPTS): string {
   if (opts.symbols)   pool += CHARSETS.symbols;
   if (!pool) pool = CHARSETS.lowercase;
 
-  return Array.from({ length }, () =>
-    pool[Math.floor(Math.random() * pool.length)]
-  ).join('');
+  const randomValues = crypto.getRandomValues(new Uint32Array(length));
+  return Array.from(randomValues, num => pool[num % pool.length]).join('');
 }
 
 function getStrength(pw: string): number {
   let score = 0;
   if (pw.length >= 8)  score++;
-  if (pw.length >= 14) score++;
+  if (pw.length >= 12) score++;
   if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
   if (/[^A-Za-z0-9]/.test(pw)) score++;
   return Math.min(score, 4);
@@ -41,16 +54,18 @@ const strengthColor = ['', '#f04a6b', '#f5a623', '#f5e623', '#00d48a'];
 
 const DEFAULT_OPTS = { uppercase: true, lowercase: true, numbers: true, symbols: false };
 
-export default function AddPasswordModal({ onClose, onAdd }: Props) {
+export default function AddPasswordModal({ onClose, onAdd, onSuccess, onError, entry }: Props) {
+  const isEdit = !!entry;
   // Form fields
-  const [title, setTitle]       = useState('');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [url, setUrl]           = useState('');
-  const [notes, setNotes]       = useState('');
-  const [category, setCategory] = useState('');
-  const [favorite, setFavorite] = useState(false);
+  const [title, setTitle]       = useState(entry?.title ?? '');
+  const [username, setUsername] = useState(entry?.username ?? '');
+  const [password, setPassword] = useState(entry?.password ?? '');
+  const [url, setUrl]           = useState(entry?.url ?? '');
+  const [notes, setNotes]       = useState(entry?.notes ?? '');
+  const [category, setCategory] = useState(entry?.category ?? '');
+  const [favorite, setFavorite] = useState(entry?.isFavorite ?? false);
   const [showPw, setShowPw]     = useState(false);
+  const [saving, setSaving]     = useState(false);
 
   // Generator
   const [showGenerator, setShowGenerator] = useState(false);
@@ -76,15 +91,23 @@ export default function AddPasswordModal({ onClose, onAdd }: Props) {
     regenerate(genLength, next);
   };
 
-  // TODO: wire to vaultService.create()
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSaving(true);
     try {
-      await addVaultItem({ title, password, url, notes, category });
+      if (isEdit) {
+        await updateVaultItem(entry!.id, { title, password, username, url, notes, category, isFavorite: favorite });
+        onSuccess?.('Password updated successfully');
+      } else {
+        await addVaultItem({ title, password, username, url, notes, category, isFavorite: favorite });
+        onSuccess?.('Password saved successfully');
+      }
       onAdd();
       onClose();
-    } catch (err) {
-      console.error('Failed to add vault item', err);
+    } catch {
+      onError?.('Failed to save password');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -95,7 +118,7 @@ export default function AddPasswordModal({ onClose, onAdd }: Props) {
         <div className="modal-header">
           <div className="modal-title-group">
             <FiKey size={20} className="modal-title-icon" />
-            <h3>Add password</h3>
+            <h3>{isEdit ? 'Edit password' : 'Add password'}</h3>
           </div>
           <button className="btn btn-icon" onClick={onClose}><FiX size={17} /></button>
         </div>
@@ -225,8 +248,10 @@ export default function AddPasswordModal({ onClose, onAdd }: Props) {
 
           {/* Actions */}
           <div className="modal-actions">
-            <button type="button" className="btn btn-ghost" onClick={onClose}>Cancel</button>
-            <button type="submit" className="btn btn-primary">Save password</button>
+            <button type="button" className="btn btn-ghost" onClick={onClose} disabled={saving}>Cancel</button>
+            <button type="submit" className="btn btn-primary" disabled={saving}>
+              {saving ? 'Saving…' : isEdit ? 'Update password' : 'Save password'}
+            </button>
           </div>
         </form>
       </div>

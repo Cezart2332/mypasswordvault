@@ -1,0 +1,42 @@
+.tfa-login-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1d6ef7 0%, #00c8ff 100%);
+  color: #fff;
+  margin: 0 auto 1rem;
+}
+
+.tfa-code-row {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin: 1.5rem 0;
+}
+
+.tfa-digit-input {
+  width: 48px;
+  height: 56px;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  caret-color: #1d6ef7;
+}
+
+.tfa-digit-input:focus {
+  border-color: #1d6ef7;
+  box-shadow: 0 0 0 3px rgba(29, 110, 247, 0.2);
+}
+
+.tfa-digit-input:not(:placeholder-shown) {
+  border-color: rgba(0, 200, 255, 0.4);
+}

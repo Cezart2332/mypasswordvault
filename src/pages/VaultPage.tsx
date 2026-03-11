@@ -1,40 +1,38 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import {
   FiLock, FiGrid, FiCode, FiMail, FiBriefcase, FiKey,
-  FiLogOut, FiSearch, FiX, FiPlus, FiLoader, FiInbox,
-  FiEye, FiEyeOff, FiCopy, FiTrash2,
+  FiLogOut, FiSearch, FiX, FiPlus, FiLoader, FiInbox, FiSettings, FiStar,
 } from 'react-icons/fi';
 import AddPasswordModal from '../components/vault/AddPasswordModal';
+import UnlockVaultModal from '../components/vault/UnlockVaultModal';
+import VaultList from '../components/vault/VaultList';
+import Toast from '../components/common/Toast';
+import ConfirmDialog from '../components/common/ConfirmDialog';
+import { useToast } from '../hooks/useToast';
 import { useAuth } from '../context/AuthContext';
 import { getUserInfo } from '../services/userService';
 import { getVaultItems, deleteVaultItem } from '../services/vaultService';
-import { useNavigate } from 'react-router-dom';
 import './VaultPage.css';
 
 function getStrength(pw: string): number {
   let score = 0;
   if (pw.length >= 8)  score++;
-  if (pw.length >= 14) score++;
+  if (pw.length >= 12) score++;
   if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
   if (/[^A-Za-z0-9]/.test(pw)) score++;
   return Math.min(score, 4);
 }
 
-const strengthInfo = [
-  { label: 'Weak',   color: '#f04a6b' },
-  { label: 'Weak',   color: '#f04a6b' },
-  { label: 'Fair',   color: '#f5a623' },
-  { label: 'Good',   color: '#f5e623' },
-  { label: 'Strong', color: '#00d48a' },
-];
-
 interface Entry {
   id: number;
   title: string;
   password: string;
+  username: string;
   url: string;
   notes: string;
   category: string;
+  isFavorite: boolean;
   createdAt: string;
   strength: number;
 }
@@ -42,12 +40,17 @@ interface Entry {
 export default function VaultPage() {
   const [entries, setEntries] = useState<Entry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isVaultLocked, setIsVaultLocked] = useState(false);
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
   const [showModal, setShowModal] = useState(false);
-  const [revealedId, setRevealedId] = useState<number | null>(null);
+  const [editingEntry, setEditingEntry] = useState<Entry | null>(null);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [deletingLoading, setDeletingLoading] = useState(false);
+  const [copyId, setCopyId] = useState<number | null>(null);
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
+  const { toasts, addToast, removeToast } = useToast();
   const navigate = useNavigate();
   const { logout } = useAuth();
 
@@ -58,10 +61,10 @@ export default function VaultPage() {
         ...item,
         strength: getStrength(item.password),
       })));
+      setIsVaultLocked(false);
     } catch (err: any) {
-      if (err.message === 'Vault locked') {
-        logout();
-        navigate('/login');
+      if (err.message === 'Vault locked' || err.message === 'Vault key not found') {
+        setIsVaultLocked(true);
       }
     } finally {
       setLoading(false);
@@ -76,22 +79,38 @@ export default function VaultPage() {
     loadEntries();
   }, [loadEntries]);
 
-  const handleDelete = async (id: number) => {
-    await deleteVaultItem(id);
-    setEntries(prev => prev.filter(e => e.id !== id));
+  const confirmDelete = (id: number) => setDeletingId(id);
+
+  const handleDelete = async () => {
+    if (deletingId === null) return;
+    setDeletingLoading(true);
+    try {
+      await deleteVaultItem(deletingId);
+      setEntries(prev => prev.filter(e => e.id !== deletingId));
+      addToast('Password deleted', 'success');
+    } catch {
+      addToast('Failed to delete password', 'error');
+    } finally {
+      setDeletingLoading(false);
+      setDeletingId(null);
+    }
   };
 
-  const handleCopy = (password: string) => {
-    navigator.clipboard.writeText(password);
+  const handleCopy = async (id: number, password: string) => {
+    await navigator.clipboard.writeText(password);
+    setCopyId(id);
+    addToast('Password copied to clipboard', 'success');
+    setTimeout(() => setCopyId(null), 2000);
   };
 
-  const categories = ['All', ...Array.from(new Set(entries.map(e => e.category).filter(Boolean)))];
+  const categories = ['All', 'Favorites', ...Array.from(new Set(entries.map(e => e.category).filter(Boolean)))];
 
   const filtered = entries.filter(e => {
     const matchSearch =
       e.title.toLowerCase().includes(search.toLowerCase()) ||
       e.url?.toLowerCase().includes(search.toLowerCase());
-    const matchCat = activeCategory === 'All' || e.category === activeCategory;
+    const matchCat = activeCategory === 'All' ||
+      (activeCategory === 'Favorites' ? e.isFavorite : e.category === activeCategory);
     return matchSearch && matchCat;
   });
 
@@ -135,11 +154,11 @@ export default function VaultPage() {
               onClick={() => setActiveCategory(cat)}
             >
               <span className="sidebar-nav-icon">
-                {cat === 'All' ? <FiGrid size={14} /> : cat === 'Dev' ? <FiCode size={14} /> : cat === 'Email' ? <FiMail size={14} /> : cat === 'Work' ? <FiBriefcase size={14} /> : <FiKey size={14} />}
+                {cat === 'All' ? <FiGrid size={14} /> : cat === 'Favorites' ? <FiStar size={14} /> : cat === 'Dev' ? <FiCode size={14} /> : cat === 'Email' ? <FiMail size={14} /> : cat === 'Work' ? <FiBriefcase size={14} /> : <FiKey size={14} />}
               </span>
               <span>{cat}</span>
               <span className="sidebar-nav-count">
-                {cat === 'All' ? entries.length : entries.filter(e => e.category === cat).length}
+                {cat === 'All' ? entries.length : cat === 'Favorites' ? entries.filter(e => e.isFavorite).length : entries.filter(e => e.category === cat).length}
               </span>
             </button>
           ))}
@@ -153,6 +172,9 @@ export default function VaultPage() {
               <span className="sidebar-user-email">{email || '…'}</span>
             </div>
           </div>
+          <Link to="/settings" className="btn btn-ghost btn-sm btn-full sidebar-settings">
+            <FiSettings size={15} /> Security settings
+          </Link>
           <button className="btn btn-ghost btn-sm btn-full sidebar-logout" onClick={logOut}>
             <FiLogOut size={15} /> Sign out
           </button>
@@ -180,7 +202,7 @@ export default function VaultPage() {
                 <span className="search-clear" onClick={() => setSearch('')}><FiX size={13} /></span>
               )}
             </div>
-            <button className="btn btn-primary" onClick={() => setShowModal(true)}>
+            <button className="btn btn-primary" onClick={() => { setEditingEntry(null); setShowModal(true); }}>
               <FiPlus size={16} /> Add password
             </button>
           </div>
@@ -199,86 +221,44 @@ export default function VaultPage() {
             <p>Try a different search or category</p>
           </div>
         ) : (
-          <div className="vault-grid">
-            {filtered.map(entry => (
-              <div key={entry.id} className="pw-card card">
-                <div className="pw-card-header">
-                  <div className="pw-card-avatar">
-                    {entry.title[0].toUpperCase()}
-                  </div>
-                  <div className="pw-card-info">
-                    <h3 className="pw-card-title">{entry.title}</h3>
-                    <span className="pw-card-url">{entry.url}</span>
-                  </div>
-                </div>
-
-                <div className="pw-card-body">
-                  <div className="pw-card-field">
-                    <span className="pw-card-field-label">Category</span>
-                    <span className="pw-card-field-value">{entry.category || '—'}</span>
-                  </div>
-                  <div className="pw-card-field">
-                    <span className="pw-card-field-label">Password</span>
-                    <span className="pw-card-field-value mono">
-                      {revealedId === entry.id ? entry.password : '••••••••••••'}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Strength bar */}
-                <div className="pw-card-strength">
-                  <div className="strength-bar-row">
-                    {[1, 2, 3, 4].map(i => (
-                      <span
-                        key={i}
-                        style={{ background: i <= entry.strength ? strengthInfo[entry.strength].color : 'var(--border)' }}
-                      />
-                    ))}
-                  </div>
-                  <span className="pw-strength-label" style={{ color: strengthInfo[entry.strength].color }}>
-                    {strengthInfo[entry.strength].label}
-                  </span>
-                </div>
-
-                <div className="pw-card-footer">
-                  <span className="pw-card-date">
-                    {new Date(entry.createdAt).toLocaleDateString()}
-                  </span>
-                  <div className="pw-card-actions">
-                    <button
-                      className="btn btn-icon"
-                      title="Reveal password"
-                      onClick={() => setRevealedId(revealedId === entry.id ? null : entry.id)}
-                    >
-                      {revealedId === entry.id ? <FiEyeOff size={15} /> : <FiEye size={15} />}
-                    </button>
-                    <button
-                      className="btn btn-icon"
-                      title="Copy password"
-                      onClick={() => handleCopy(entry.password)}
-                    >
-                      <FiCopy size={15} />
-                    </button>
-                    <button
-                      className="btn btn-icon btn-icon-danger"
-                      title="Delete"
-                      onClick={() => handleDelete(entry.id)}
-                    >
-                      <FiTrash2 size={15} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <VaultList
+            entries={filtered}
+            copyId={copyId}
+            onCopy={handleCopy}
+            onEdit={entry => { setEditingEntry(entry); setShowModal(true); }}
+            onDelete={confirmDelete}
+          />
         )}
       </main>
 
       {/* ── ADD PASSWORD MODAL ── */}
       {showModal && (
         <AddPasswordModal
-          onClose={() => setShowModal(false)}
+          onClose={() => { setShowModal(false); setEditingEntry(null); }}
           onAdd={loadEntries}
+          onSuccess={msg => addToast(msg, 'success')}
+          onError={msg => addToast(msg, 'error')}
+          entry={editingEntry ?? undefined}
+        />
+      )}
+
+      {/* ── DELETE CONFIRMATION ── */}
+      {deletingId !== null && (
+        <ConfirmDialog
+          message="Are you sure you want to delete this password? This action cannot be undone."
+          onConfirm={handleDelete}
+          onCancel={() => setDeletingId(null)}
+          loading={deletingLoading}
+        />
+      )}
+
+      {/* ── TOASTS ── */}
+      <Toast toasts={toasts} onRemove={removeToast} />
+
+      {isVaultLocked && (
+        <UnlockVaultModal
+          email={email}
+          onUnlocked={() => { setIsVaultLocked(false); loadEntries(); }}
         />
       )}
     </div>
