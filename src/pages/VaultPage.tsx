@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
   FiLock, FiGrid, FiCode, FiMail, FiBriefcase, FiKey,
-  FiLogOut, FiSearch, FiX, FiPlus, FiLoader, FiInbox, FiSettings, FiStar,
+  FiLogOut, FiSearch, FiX, FiPlus, FiLoader, FiInbox, FiSettings, FiStar, FiMenu,
 } from 'react-icons/fi';
 import AddPasswordModal from '../components/vault/AddPasswordModal';
 import UnlockVaultModal from '../components/vault/UnlockVaultModal';
@@ -48,6 +48,7 @@ export default function VaultPage() {
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [deletingLoading, setDeletingLoading] = useState(false);
   const [copyId, setCopyId] = useState<number | null>(null);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const { toasts, addToast, removeToast } = useToast();
@@ -121,8 +122,20 @@ export default function VaultPage() {
 
   return (
     <div className="vault-layout">
+      {/* ── SIDEBAR BACKDROP (mobile) ── */}
+      {mobileSidebarOpen && (
+        <div className="vault-sidebar-backdrop" onClick={() => setMobileSidebarOpen(false)} />
+      )}
+
       {/* ── SIDEBAR ── */}
-      <aside className="vault-sidebar">
+      <aside className={`vault-sidebar${mobileSidebarOpen ? ' mobile-open' : ''}`}>
+        <button
+          className="sidebar-mobile-close"
+          onClick={() => setMobileSidebarOpen(false)}
+          aria-label="Close menu"
+        >
+          <FiX size={20} />
+        </button>
         <div className="sidebar-brand">
           <FiLock size={20} />
           <span>MyPasswordVault</span>
@@ -151,7 +164,7 @@ export default function VaultPage() {
             <button
               key={cat}
               className={`sidebar-nav-item ${activeCategory === cat ? 'active' : ''}`}
-              onClick={() => setActiveCategory(cat)}
+              onClick={() => { setActiveCategory(cat); setMobileSidebarOpen(false); }}
             >
               <span className="sidebar-nav-icon">
                 {cat === 'All' ? <FiGrid size={14} /> : cat === 'Favorites' ? <FiStar size={14} /> : cat === 'Dev' ? <FiCode size={14} /> : cat === 'Email' ? <FiMail size={14} /> : cat === 'Work' ? <FiBriefcase size={14} /> : <FiKey size={14} />}
@@ -186,6 +199,13 @@ export default function VaultPage() {
         {/* Top bar */}
         <header className="vault-topbar">
           <div className="vault-topbar-left">
+            <button
+              className="btn-hamburger"
+              onClick={() => setMobileSidebarOpen(true)}
+              aria-label="Open menu"
+            >
+              <FiMenu size={22} />
+            </button>
             <h1>{activeCategory === 'All' ? 'All passwords' : activeCategory}</h1>
             <span className="badge badge-blue">{filtered.length} entries</span>
           </div>
@@ -203,7 +223,7 @@ export default function VaultPage() {
               )}
             </div>
             <button className="btn btn-primary" onClick={() => { setEditingEntry(null); setShowModal(true); }}>
-              <FiPlus size={16} /> Add password
+              <FiPlus size={16} /> <span className="btn-add-text">Add password</span>
             </button>
           </div>
         </header>

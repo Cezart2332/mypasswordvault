@@ -228,3 +228,10 @@
   .hero-preview { flex: none; width: 100%; max-width: 360px; }
   .landing-footer { flex-direction: column; gap: 8px; text-align: center; }
 }
+@media (max-width: 480px) {
+  .landing-nav-inner { padding: 12px 16px; }
+  .landing-logo span { display: none; }
+  .hero { padding: 48px 16px; gap: 36px; }
+  .features { padding: 48px 16px; }
+  .cta-section { padding: 48px 16px; }
+}

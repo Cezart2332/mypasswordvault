@@ -214,3 +214,58 @@
   border-color: #1d6ef7;
   box-shadow: 0 0 0 3px rgba(29, 110, 247, 0.2);
 }
+
+/* ─── RESPONSIVE ──────────────────────────────────────── */
+@media (max-width: 680px) {
+  .settings-topbar {
+    padding: 0.875rem 1rem;
+  }
+  .settings-brand {
+    display: none;
+  }
+  .settings-content {
+    margin: 1.5rem auto;
+    padding: 0 1rem;
+  }
+  .settings-title {
+    font-size: 1.4rem;
+    margin-bottom: 1.25rem;
+  }
+  .settings-card-header {
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+  }
+  /* Push badge to its own row, aligned under the text */
+  .settings-badge {
+    order: 3;
+    flex-basis: auto;
+  }
+  .settings-actions {
+    flex-direction: column;
+  }
+  .settings-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .settings-card-body {
+    padding: 1.25rem 1rem;
+  }
+  .settings-card-header {
+    padding: 1.25rem 1rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .tfa-code-row {
+    gap: 0.3rem;
+  }
+  .tfa-digit-input {
+    width: 40px;
+    height: 50px;
+    font-size: 1.25rem;
+    border-radius: 8px;
+  }
+  .settings-card-body {
+    padding: 1rem;
+  }
+}

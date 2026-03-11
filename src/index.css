@@ -333,3 +333,19 @@ h1, h2, h3, h4 { font-weight: 600; letter-spacing: -0.02em; line-height: 1.2; }
 .strength-bar.s2 span:nth-child(-n+2) { background: #f5a623; }
 .strength-bar.s3 span:nth-child(-n+3) { background: #f5e623; }
 .strength-bar.s4 span:nth-child(-n+4) { background: var(--success); }
+
+/* ─── RESPONSIVE ─────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  /* Modal fills more of the screen on mobile */
+  .modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+  .modal {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    max-height: 92vh;
+    padding: 24px 20px;
+  }
+}
